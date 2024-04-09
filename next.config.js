@@ -1,3 +1,5 @@
-module.exports = {
-  distDir: '.vercel/output/static',
-};
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+}
+module.exports = nextConfig
