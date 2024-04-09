@@ -1,13 +1,12 @@
 {
 	"name": "choosecloudflare",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"private": true,
-	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "next dev",
-		"start": "wrangler dev",
-		"test": "vitest"
-	},
+	  "scripts": {
+	    "dev": "next dev",
+	    "build": "next build",
+	    "start": "next start"
+	  },
 	"dependencies": {
 		"@cloudflare/next-on-pages": "^1.11.0",
 		"eventsource-parser": "^1.1.1",
