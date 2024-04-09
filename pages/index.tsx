@@ -5,6 +5,9 @@ import React, { useEffect } from "react";
 import { useKonami } from 'react-konami-code';
 import Header from "./components/header"
 
+export const runtime = 'edge';
+
+
 const HomePage: NextPage = () => {
 
   useEffect(() => {
