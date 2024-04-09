@@ -44,7 +44,7 @@ const sendMessage = async (message: string) => {
   setIsLoading(true);
   try {
     // Add user message to the messages state
-    const updatedMessages = [...messages, { role: 'user', content: message }];
+    const updatedMessages: Message[] = [...messages, { role: 'user', content: message }]; 
     setMessages(updatedMessages);
 
     // Prepare the request body with the current chat history
