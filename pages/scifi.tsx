@@ -4,7 +4,7 @@ import { useKonami } from 'react-konami-code';
 import Header from "./components/header"
 
 export interface Env {}
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 
 interface Message {
