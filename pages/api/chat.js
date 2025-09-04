@@ -1,6 +1,8 @@
 // Next.js API route for local development
 // This mimics the Cloudflare function at functions/api/chat.js
 
+export const runtime = 'edge';
+
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
