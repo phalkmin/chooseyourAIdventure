@@ -9,12 +9,9 @@ export async function onRequestPost(context) {
     // Check if AI binding exists
     if (!env.AI) {
       console.error('AI binding not available');
-      return new Response(JSON.stringify({ error: 'AI service not configured' }), { 
+      return Response.json({ error: 'AI service not configured' }, { 
         status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders
-        }
+        headers: corsHeaders
       });
     }
 
@@ -23,23 +20,17 @@ export async function onRequestPost(context) {
     try {
       requestBody = await request.json();
     } catch (error) {
-      return new Response(JSON.stringify({ error: 'Invalid JSON' }), { 
+      return Response.json({ error: 'Invalid JSON' }, { 
         status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders
-        }
+        headers: corsHeaders
       });
     }
 
     // Validate messages
     if (!requestBody.messages || !Array.isArray(requestBody.messages)) {
-      return new Response(JSON.stringify({ error: 'Messages array required' }), { 
+      return Response.json({ error: 'Messages array required' }, { 
         status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders
-        }
+        headers: corsHeaders
       });
     }
 
@@ -57,34 +48,31 @@ export async function onRequestPost(context) {
 
     console.log('AI response received:', response);
 
-    return new Response(JSON.stringify({ 
+    return Response.json({ 
       response: response.response || 'No response from AI',
       success: true 
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        ...corsHeaders
-      }
+    }, {
+      headers: corsHeaders
     });
 
   } catch (error) {
     console.error('Function error:', error);
-    return new Response(JSON.stringify({ 
+    return Response.json({ 
       error: 'Internal server error', 
       details: error.message,
       stack: error.stack 
-    }), { 
+    }, { 
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        ...corsHeaders
-      }
+      headers: corsHeaders
     });
   }
 }
 
 export async function onRequestOptions() {
-  return new Response(null, { headers: corsHeaders });
+  return new Response(null, { 
+    status: 200,
+    headers: corsHeaders 
+  });
 }
 
 const corsHeaders = {
