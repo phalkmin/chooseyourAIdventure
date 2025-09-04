@@ -2,27 +2,24 @@
 	"name": "choosecloudflare",
 	"version": "1.0.0",
 	"private": true,
-	  "scripts": {
-	    "dev": "next dev",
-	    "build": "next build",
-	    "start": "next start"
-	  },
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start"
+	},
 	"dependencies": {
-		"@cloudflare/next-on-pages": "^1.11.0",
-		"eventsource-parser": "^1.1.1",
-		"highlight.js": "^11.9.0",
-		"next": "^14.0.3",
-		"node-cache": "^5.1.2",
-		"node-fetch": "^3.3.2",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
+		"@cloudflare/next-on-pages": "^1.13.7",
+		"highlight.js": "^11.11.1",
+		"next": "^15.1.7",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
 		"react-konami-code": "^2.3.0"
 	},
 	"devDependencies": {
-		"@types/node": "^20.9.4",
-		"@types/react": "^18.2.38",
-		"postcss": "^8.4.31",
-		"typescript": "^5.3.2",
-		"vitest": "1.3.0"
+		"@types/node": "^22.13.1",
+		"@types/react": "^19.0.8",
+		"postcss": "^8.5.2",
+		"typescript": "^5.7.3",
+		"vitest": "^3.0.5"
 	}
 }

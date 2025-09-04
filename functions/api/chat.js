@@ -1,65 +1,23 @@
-import { Ai } from './vendor/@cloudflare/ai.js';
+import { Ai } from '@cloudflare/ai';
 
-export default {
-  async fetch(request, env, ctx) {
-    const ai = new Ai(env.AI);
-    const url = new URL(request.url);
-    const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  const ai = new Ai(env.AI);
+  const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
 
-    // Rate limiting check
-    const rateLimitResult = await checkRateLimit(env, clientIP);
-    if (!rateLimitResult.allowed) {
-      return new Response('Rate limit exceeded. Try again later.', { 
-        status: 429,
-        headers: {
-          'Retry-After': '60',
-          ...corsHeaders
-        }
-      });
-    }
-
-    // CORS handling
-    if (request.method === 'OPTIONS') {
-      return handleCORS();
-    }
-
-    // Security headers validation
-    if (!validateSecurityHeaders(request)) {
-      return new Response('Invalid request headers', { status: 400 });
-    }
-
-    // Route requests to appropriate handlers
-    try {
-      switch (url.pathname) {
-        case '/chat':
-          return handleChat(request, ai, env, ctx);
-        case '/image':
-          return handleImage(request, ai, env, ctx);
-        case '/health':
-          return new Response('OK', { status: 200, headers: corsHeaders });
-        default:
-          return new Response('Endpoint not found.', { 
-            status: 404, 
-            headers: corsHeaders 
-          });
+  // Rate limiting check
+  const rateLimitResult = await checkRateLimit(env, clientIP);
+  if (!rateLimitResult.allowed) {
+    return new Response('Rate limit exceeded. Try again later.', { 
+      status: 429,
+      headers: {
+        'Retry-After': '60',
+        ...corsHeaders
       }
-    } catch (error) {
-      console.error('Error:', error);
-      return new Response('Internal Server Error', { 
-        status: 500, 
-        headers: corsHeaders 
-      });
-    }
-  },
-};
-
-async function handleChat(request, ai, env) {
-  // Validate request method
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    });
   }
 
-  // Validate content type
+  // Validate request
   const contentType = request.headers.get('Content-Type');
   if (!contentType || !contentType.includes('application/json')) {
     return new Response('Content-Type must be application/json', { status: 400 });
@@ -93,9 +51,11 @@ async function handleChat(request, ai, env) {
   const cacheKey = await generateCacheKey(chatHistory);
   
   // Check cache first
-  const cached = await env.CHAT_CACHE.get(cacheKey);
-  if (cached) {
-    return createResponse(JSON.parse(cached));
+  if (env.CHAT_CACHE) {
+    const cached = await env.CHAT_CACHE.get(cacheKey);
+    if (cached) {
+      return new Response(JSON.parse(cached), { headers: corsHeaders });
+    }
   }
 
   // Stream response with modern implementation
@@ -104,7 +64,7 @@ async function handleChat(request, ai, env) {
   const encoder = new TextEncoder();
 
   // Process in background
-  ctx.waitUntil((async () => {
+  context.waitUntil((async () => {
     try {
       const stream = await ai.run('@cf/meta/llama-3.1-8b-instruct', {
         max_tokens: 512,
@@ -153,55 +113,8 @@ async function handleChat(request, ai, env) {
   });
 }
 
-async function handleImage(request, ai, env) {
-  // Validate request method
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
-
-  let requestBody;
-  try {
-    requestBody = await request.json();
-  } catch (error) {
-    return new Response('Invalid JSON in request body', { status: 400 });
-  }
-
-  // Validate prompt
-  const prompt = requestBody.prompt || requestBody;
-  if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-    return new Response('prompt is required and must be a non-empty string', { status: 400 });
-  }
-
-  // Validate prompt length
-  if (prompt.length > 1000) {
-    return new Response('prompt must be less than 1000 characters', { status: 400 });
-  }
-  
-  // Add to queue if too many concurrent requests
-  const concurrentRequests = await env.IMAGE_QUEUE.get('concurrent');
-  if (concurrentRequests > 5) {
-    await env.IMAGE_QUEUE.push({
-      prompt: requestBody,
-      timestamp: Date.now()
-    });
-    return new Response('Queued', { status: 202 });
-  }
-
-  // Generate image with modern model
-  const image = await ai.run('@cf/stabilityai/stable-diffusion-xl-base-1.0', {
-    prompt: requestBody.prompt || requestBody,
-    width: 512,
-    height: 512,
-    guidance_scale: 7.5,
-    num_inference_steps: 20
-  });
-
-  return new Response(image, {
-    headers: {
-      'Content-Type': 'image/png',
-      ...corsHeaders
-    }
-  });
+export async function onRequestOptions() {
+  return new Response(null, { headers: corsHeaders });
 }
 
 const corsHeaders = {
@@ -214,12 +127,6 @@ const corsHeaders = {
   'X-XSS-Protection': '1; mode=block'
 };
 
-function handleCORS() {
-  return new Response(null, {
-    headers: corsHeaders
-  });
-}
-
 async function generateCacheKey(messages) {
   const msgString = JSON.stringify(messages);
   const encoder = new TextEncoder();
@@ -229,7 +136,6 @@ async function generateCacheKey(messages) {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Rate limiting function
 async function checkRateLimit(env, clientIP) {
   if (!env.RATE_LIMITER) return { allowed: true };
   
@@ -250,30 +156,4 @@ async function checkRateLimit(env, clientIP) {
   
   await env.RATE_LIMITER.put(key, (count + 1).toString(), { expirationTtl: window });
   return { allowed: true };
-}
-
-// Security headers validation
-function validateSecurityHeaders(request) {
-  const userAgent = request.headers.get('User-Agent');
-  
-  // Block requests without User-Agent (likely bots)
-  if (!userAgent) {
-    return false;
-  }
-  
-  // Block suspicious patterns
-  const suspiciousPatterns = [
-    /curl/i,
-    /wget/i,
-    /python-requests/i,
-    /bot/i
-  ];
-  
-  for (const pattern of suspiciousPatterns) {
-    if (pattern.test(userAgent)) {
-      return false;
-    }
-  }
-  
-  return true;
 }

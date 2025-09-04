@@ -41,78 +41,122 @@ const Chat: React.FC = () => {
 
   useKonami(easterEgg);
 
-// Update the sendMessage function to handle image display
 const sendMessage = async (message: string) => {
+  const workerUrl = process.env.NEXT_PUBLIC_CF_WORKER;
+  
+  if (!workerUrl) {
+    console.error('NEXT_PUBLIC_CF_WORKER environment variable is not set');
+    return;
+  }
+
   setIsLoading(true);
   try {
-    // Add user message to the messages state
-    const updatedMessages: Message[] = [...messages, { role: 'user', content: message }]; // Corrected the type here
+    const updatedMessages: Message[] = [...messages, { role: 'user', content: message }];
     setMessages(updatedMessages);
 
     // Prepare the request body with the current chat history
     const requestBody = { messages: updatedMessages };
 
-    // Send request to the chat worker
-    const response = await fetch(`${apiUrl}/chat`, {
+    const response = await fetch(`/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({ messages: updatedMessages }),
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok.');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const responseData = await response.json();
-    const botMessage = responseData.response.trim();
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let botMessage = '';
+
+    // Add a temporary message that will be updated
+    setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          
+          // Handle completion signal
+          if (data === '[DONE]') {
+            break;
+          }
+          
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.text) {
+              botMessage += parsed.text;
+              // Update the last message with the accumulated text
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].content = botMessage;
+                return newMessages;
+              });
+            } else if (parsed.error) {
+              console.error('Stream error:', parsed.error);
+              setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: 'Sorry, I encountered an error. Please try again.' 
+              }]);
+              break;
+            }
+          } catch (e) {
+            console.error('Error parsing chunk:', e);
+          }
+        }
+      }
+    }
     const botSetting = `cyberpunk setting, 8-bit or 16-bit old school style, neon colors, based on the following description: ${botMessage}`;
 
-    // Send request to get the image
-    const ibagensResponse = await fetch(`${apiUrl}/image`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(botMessage),
-    });
+    // Generate image after full response is received
+    if (botMessage) {
+      try {
+        const imageResponse = await fetch(`/api/image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: `cyberpunk futuristic setting, 8-bit retro pixel art style, neon colors, ${botMessage.substring(0, 200)}`
+          }),
+        });
 
-    // Check if the request for the image was successful
-    if (ibagensResponse.ok) {
-      // Convert the response to a blob
-      const blob = await ibagensResponse.blob();
-
-      // Create a URL for the blob
-      const imageUrl = URL.createObjectURL(blob);
-
-      // Remove existing image elements
-      const existingImages = document.querySelectorAll('.ibagen img');
-      existingImages.forEach(img => img.remove());
-
-      // Create an image element
-      const imageElement = document.createElement('img');
-
-      // Set the source of the image to the URL
-      imageElement.src = imageUrl;
-
-      // Append the image element to the .ibagen div
-      const ibagenContainer = document.querySelector('.ibagen');
-      ibagenContainer?.appendChild(imageElement);
-    } else {
-      console.error('Error:', ibagensResponse.statusText);
+        if (imageResponse.ok) {
+          const blob = await imageResponse.blob();
+          const imageUrl = URL.createObjectURL(blob);
+          
+          const ibagenContainer = document.querySelector('.ibagen');
+          if (ibagenContainer) {
+            ibagenContainer.innerHTML = '';
+            const imageElement = document.createElement('img');
+            imageElement.src = imageUrl;
+            ibagenContainer.appendChild(imageElement);
+          }
+        }
+      } catch (imageError) {
+        console.error('Image generation error:', imageError);
+      }
     }
-
-    // Update messages state with the bot response
-    setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: botMessage }]);
 
   } catch (error) {
     console.error('Error:', error);
+    setMessages(prev => [...prev, { 
+      role: 'assistant', 
+      content: 'Sorry, I encountered an error. Please try again.' 
+    }]);
   } finally {
     setIsLoading(false);
-    if (!isInitialLoad && messageInputRef.current) {
-      messageInputRef.current.value = ''; // Clear input field only after initial load
-    }
+    setMessageInput('');
   }
 };
 

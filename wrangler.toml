@@ -1,0 +1,22 @@
+# Cloudflare Pages configuration
+name = "chooseyouraidventure"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[build]
+command = "npm run build"
+
+[[ai]]
+binding = "AI"
+
+# Optional: Add KV namespaces for caching and rate limiting
+# Uncomment and create these in your Cloudflare dashboard if you want them
+# [[kv_namespaces]]
+# binding = "CHAT_CACHE"
+# id = "your-kv-namespace-id"
+# preview_id = "your-preview-kv-namespace-id"
+
+# [[kv_namespaces]]
+# binding = "RATE_LIMITER"
+# id = "your-rate-limit-kv-namespace-id"
+# preview_id = "your-preview-rate-limit-kv-namespace-id"
