@@ -6,6 +6,8 @@
 body {
   padding: 0 2rem;
   margin: 0 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
 }
 
 #nescss > .container {
@@ -336,6 +338,80 @@ img.lazy {
 .adventures {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+/* Enhanced Adventure Buttons */
+.adventures .nes-btn {
+    position: relative;
+    padding: 2rem 1.5rem;
+    border-width: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
+    background: linear-gradient(145deg, currentColor 0%, currentColor 100%);
+    overflow: hidden;
+}
+
+.adventures .nes-btn::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.adventures .nes-btn:hover::before {
+    opacity: 1;
+}
+
+.adventures .nes-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 12px 12px 0px rgba(0,0,0,0.3);
+}
+
+.adventures .nes-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+}
+
+.adventures .nes-btn h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+/* Enhanced Container */
+.nes-container.with-title.is-centered {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    border-width: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-radius: 0;
+}
+
+/* Header improvements */
+header {
+    background: linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%);
+    border-bottom: 6px solid #212529;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+header .nav-brand h1 {
+    text-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+    margin-bottom: 0.5rem;
+}
+
+header .nav-brand p {
+    margin: 0.25rem 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
 }
 
 .ibagen {
@@ -357,4 +433,68 @@ img.lazy {
 
 .nes-select select, .nes-input  {
     border-image-repeat: repeat !important;
+}
+
+/* Subtle animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+.nes-logo {
+    animation: pulse 2s infinite;
+}
+
+/* Enhanced main container */
+#nescss > .container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Better responsive design */
+@media screen and (max-width: 768px) {
+    .adventures .nes-btn {
+        padding: 1.5rem 1rem;
+    }
+    
+    .adventures .nes-btn h3 {
+        font-size: 1rem;
+    }
+    
+    #nescss > .container {
+        padding: 1rem;
+        margin: 0 0.5rem;
+    }
+}
+
+/* Add subtle loading states */
+.nes-btn:focus {
+    outline: 3px solid rgba(66, 165, 245, 0.5);
+    outline-offset: 2px;
+}
+
+/* Enhanced visual hierarchy */
+.showcase {
+    position: relative;
+}
+
+.showcase::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    z-index: -1;
+    border-radius: 20px;
 }

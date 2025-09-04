@@ -12,7 +12,6 @@ interface Message {
 }
 
 const Chat: React.FC = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_CF_WORKER;
   const chatHistoryRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,13 +62,6 @@ const Chat: React.FC = () => {
 
 
 const sendMessage = async (message: string) => {
-  const workerUrl = process.env.NEXT_PUBLIC_CF_WORKER;
-  
-  if (!workerUrl) {
-    console.error('NEXT_PUBLIC_CF_WORKER environment variable is not set');
-    return;
-  }
-
   setIsLoading(true);
   try {
     const updatedMessages: Message[] = [...messages, { role: 'user', content: message }];
