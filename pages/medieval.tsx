@@ -162,7 +162,13 @@ const handleSendMessage = () => {
   return (
 <>
       <Head>
-        <title>Choose Your Own AIdventure</title>
+        <title>Medieval Quest - Choose Your Own AIdventure</title>
+        <meta name="description" content="Embark on a medieval fantasy quest. Retrieve the Golden Axe, battle mythical creatures, and shape your own legend in this AI-driven RPG." />
+        <meta name="keywords" content="Medieval, Fantasy, RPG, Quest, AI Game, Adventure, Golden Axe" />
+        <meta property="og:title" content="Medieval Quest - Choose Your Own AIdventure" />
+        <meta property="og:description" content="Enter a world of magic and monsters. Your choices decide your fate." />
+        <meta property="twitter:title" content="Medieval Quest - Choose Your Own AIdventure" />
+        <meta property="twitter:description" content="Enter a world of magic and monsters. Your choices decide your fate." />
       </Head>
 
       <Header/>
@@ -213,13 +219,18 @@ const handleSendMessage = () => {
                 />
               </>
               )}
-              <button onClick={handleSendMessage} disabled={isLoading}>
-  {isLoading ? "Sending..." : "Send"}
-</button>
+              <button 
+                className={`nes-btn ${isLoading ? 'is-disabled' : 'is-primary'}`}
+                onClick={handleSendMessage} 
+                disabled={isLoading}
+                style={{ marginLeft: '10px' }}
+              >
+                {isLoading ? "..." : "Send"}
+              </button>
             </div>
           </section>
           </div>
-          <div className="ibagen"></div>
+          <div className="ibagen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}></div>
           </div>
       </main>
     </>

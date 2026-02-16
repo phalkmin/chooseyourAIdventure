@@ -146,7 +146,13 @@ const handleSendMessage = () => {
   return (
 <>
       <Head>
-        <title>Choose Your Own AIdventure</title>
+        <title>Sci-Fi Cyberpunk Adventure - Choose Your Own AIdventure</title>
+        <meta name="description" content="Dive into a futuristic cyberpunk dystopia. Navigate neon streets, uncover conspiracies, and survive in this AI-generated sci-fi RPG." />
+        <meta name="keywords" content="Cyberpunk, Sci-Fi, RPG, AI Game, Adventure, Futuristic, Neon" />
+        <meta property="og:title" content="Sci-Fi Cyberpunk Adventure - Choose Your Own AIdventure" />
+        <meta property="og:description" content="Survive the neon-lit streets of a cyberpunk future. Every choice matters." />
+        <meta property="twitter:title" content="Sci-Fi Cyberpunk Adventure - Choose Your Own AIdventure" />
+        <meta property="twitter:description" content="Survive the neon-lit streets of a cyberpunk future. Every choice matters." />
       </Head>
 
       <Header/>
@@ -196,13 +202,18 @@ const handleSendMessage = () => {
                 />
               </>
               )}
-              <button onClick={handleSendMessage} disabled={isLoading}>
-  {isLoading ? "Sending..." : "Send"}
-</button>
+              <button 
+                className={`nes-btn ${isLoading ? 'is-disabled' : 'is-primary'}`}
+                onClick={handleSendMessage} 
+                disabled={isLoading}
+                style={{ marginLeft: '10px' }}
+              >
+                {isLoading ? "..." : "Send"}
+              </button>
             </div>
           </section>
           </div>
-          <div className="ibagen"></div>
+          <div className="ibagen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}></div>
           </div>
       </main>
     </>
