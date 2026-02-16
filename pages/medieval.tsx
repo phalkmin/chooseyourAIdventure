@@ -90,7 +90,7 @@ const sendMessage = async (message: string) => {
     
     const botMessage = result.response || 'No response received';
     
-    // Add the complete response as a new message
+    // Add the complete response as a new message to the state
     setMessages(prev => [...prev, { role: 'assistant', content: botMessage }]);
 
     // Generate image after full response is received

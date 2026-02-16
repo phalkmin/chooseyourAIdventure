@@ -72,7 +72,7 @@ const sendMessage = async (message: string) => {
     
     const botMessage = result.response || 'No response received';
     
-    // Add the complete response as a new message
+    // Add the complete response as a new message to the state
     setMessages(prev => [...prev, { role: 'assistant', content: botMessage }]);
     const botSetting = `cyberpunk setting, 8-bit or 16-bit old school style, neon colors, based on the following description: ${botMessage}`;
 

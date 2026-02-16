@@ -5,21 +5,24 @@
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start",
+		"pages:dev": "wrangler pages dev",
+		"pages:deploy": "npm run build && wrangler pages deploy"
 	},
 	"dependencies": {
-		"@cloudflare/next-on-pages": "^1.13.7",
 		"highlight.js": "^11.11.1",
-		"next": "^15.1.7",
-		"react": "^19.0.0",
-		"react-dom": "^19.0.0",
+		"next": "^16.1.6",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4",
 		"react-konami-code": "^2.3.0"
 	},
 	"devDependencies": {
-		"@types/node": "^22.13.1",
-		"@types/react": "^19.0.8",
-		"postcss": "^8.5.2",
-		"typescript": "^5.7.3",
-		"vitest": "^3.0.5"
+		"@opennextjs/cloudflare": "^1.16.5",
+		"@types/node": "^25.2.3",
+		"@types/react": "^19.2.14",
+		"postcss": "^8.5.6",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18",
+		"wrangler": "^4.65.0"
 	}
 }

@@ -1,39 +1,60 @@
+# Choose Your Own AIdventure
 
-# Choose your own AIdventure
+A retro-style "Choose Your Own Adventure" RPG powered by Cloudflare Workers AI.
 
-This repository is a submission for the [Cloudflare AI Challenge](https://dev.to/devteam/join-us-for-the-cloudflare-ai-challenge-3000-in-prizes-5f99).
+## Features
 
+- **AI-Powered Dungeon Master**: Dynamically generated stories based on your choices.
+- **AI Image Generation**: Visualizes the scene based on the story progress.
+- **Retro Aesthetic**: NES-style UI using `nes.css`.
+- **Cloudflare Native**: Optimized for Cloudflare Pages and Workers AI.
 
-## Demo
+## Getting Started
 
-Demo can be [seen and played here](https://chooseyouraidventure.pages.dev/)
+### Prerequisites
 
-![Old School style RPG](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/ib2vq45ho2tti85smk5l.png)
+- Node.js (v18 or newer)
+- npm
 
-## Deployment
-
-To deploy this project, clone it and upload the file from `WK` folder to a new CloudFlare Worker. 
-
-Then, create a .env file with:
-
-NEXT_PUBLIC_CF_WORKER=<WORKER URL YOU CREATED>
-
-then run
+### Installation
 
 ```bash
-  npm install
+npm install
 ```
 
-to test :
+### Local Development
+
+To run the project locally with simulated AI responses:
 
 ```bash
-  npm run dev 
+npm run dev
 ```
 
-to build locally :
+To test with actual Cloudflare AI bindings locally (requires Cloudflare login):
 
 ```bash
-  npx @cloudflare/next-on-pages@1
+npm run pages:dev
 ```
 
-If everything is OK, then create a new CloudFlare Pages and upload the folder OR connect your github repository to it. Create the variable NEXT_PUBLIC_CF_WORKER before the first build
+### Deployment
+
+This project is designed to be deployed to **Cloudflare Pages**.
+
+1. Connect your GitHub repository to Cloudflare Pages.
+2. Set the build command to `npm run build`.
+3. Set the build output directory to `.next`.
+4. Add the `AI` binding in your Pages project settings (Settings > Functions > Compatibility Flags > AI).
+
+To deploy manually via CLI:
+
+```bash
+npm run pages:deploy
+```
+
+## Technologies
+
+- **Framework**: Next.js 16
+- **Styling**: nes.css
+- **AI Platform**: Cloudflare Workers AI
+- **Adapter**: OpenNext for Cloudflare
+- **Deployment**: Cloudflare Pages
