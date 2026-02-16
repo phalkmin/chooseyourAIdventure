@@ -1,10 +1,6 @@
 export const runtime = 'edge';
 
-export default async function handler(req) {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
-
+export async function POST(req) {
   try {
     const body = await req.json();
     const prompt = body.prompt || 'A beautiful fantasy landscape';
@@ -13,33 +9,35 @@ export default async function handler(req) {
 
     if (env && env.AI) {
       console.log('Generating image with Cloudflare AI (SDXL Lightning)...');
-      const image = await env.AI.run('@cf/bytedance/stable-diffusion-xl-lightning', {
-        prompt: prompt,
-        width: 512,
-        height: 512,
-        num_steps: 4 // Lightning models excel at low step counts
-      });
+      const image = await env.AI.run(
+        '@cf/bytedance/stable-diffusion-xl-lightning',
+        {
+          prompt: prompt,
+          width: 512,
+          height: 512,
+          num_steps: 4,
+        }
+      );
 
       return new Response(image, {
-        headers: { 'Content-Type': 'image/png' }
+        headers: { 'Content-Type': 'image/png' },
       });
     }
 
-    // Local development fallback - return a placeholder image from a service
+    // Local development fallback
     console.log('AI binding not found for image, using placeholder...');
     const placeholderUrl = `https://placehold.co/512x512/000000/FFFFFF/png?text=${encodeURIComponent(prompt.substring(0, 30))}`;
     const response = await fetch(placeholderUrl);
     const blob = await response.blob();
-    
-    return new Response(blob, {
-      headers: { 'Content-Type': 'image/png' }
-    });
 
+    return new Response(blob, {
+      headers: { 'Content-Type': 'image/png' },
+    });
   } catch (error) {
     console.error('Image API error:', error);
-    return new Response(JSON.stringify({ error: 'Image generation failed' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({ error: 'Image generation failed' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 }
