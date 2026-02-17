@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export const runtime = 'edge';
 
@@ -6,22 +7,16 @@ interface ImageBody {
   prompt?: string;
 }
 
-interface Env {
-  AI?: any;
-  CLOUDFLARE_ACCOUNT_ID?: string;
-  CLOUDFLARE_API_TOKEN?: string;
-}
-
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ImageBody;
     const prompt = body.prompt || 'A beautiful fantasy landscape';
 
-    // @ts-ignore - req.context is added by Cloudflare Pages / OpenNext
-    const env = (req.context?.env || process.env) as Env;
+    // Get Cloudflare bindings via OpenNext
+    const { env } = getCloudflareContext();
 
     // Priority 1: Cloudflare AI Binding
-    if (env && env.AI) {
+    if (env?.AI) {
       console.log('Generating image with Cloudflare AI (SDXL Lightning) via binding...');
       const image = await env.AI.run(
         '@cf/bytedance/stable-diffusion-xl-lightning',
@@ -39,8 +34,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Priority 2: Cloudflare AI via REST API (for local development without wrangler)
-    const accountId = env.CLOUDFLARE_ACCOUNT_ID;
-    const apiToken = env.CLOUDFLARE_API_TOKEN;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+    const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 
     if (accountId && apiToken) {
       console.log('Generating image with Cloudflare AI via REST API...');

@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export const runtime = 'edge';
 
@@ -9,12 +10,6 @@ interface Message {
 
 interface ChatBody {
   messages: Message[];
-}
-
-interface Env {
-  AI?: any;
-  CLOUDFLARE_ACCOUNT_ID?: string;
-  CLOUDFLARE_API_TOKEN?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -30,11 +25,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // @ts-ignore - req.context is added by Cloudflare Pages / OpenNext
-    const env = (req.context?.env || process.env) as Env;
+    // Get Cloudflare bindings via OpenNext
+    const { env } = getCloudflareContext();
 
     // Priority 1: Cloudflare AI Binding
-    if (env && env.AI) {
+    if (env?.AI) {
       console.log('Using Cloudflare AI binding...');
       const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
         max_tokens: 1024,
@@ -52,8 +47,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Priority 2: Cloudflare AI via REST API (for local development without wrangler)
-    const accountId = env.CLOUDFLARE_ACCOUNT_ID;
-    const apiToken = env.CLOUDFLARE_API_TOKEN;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+    const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 
     if (accountId && apiToken) {
       console.log('Using Cloudflare AI via REST API...');
