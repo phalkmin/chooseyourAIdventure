@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
 
 export const runtime = 'edge';
 
@@ -25,28 +24,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get Cloudflare bindings via OpenNext
-    const { env } = getCloudflareContext();
+    // Priority 1: Cloudflare AI Binding (only works on Cloudflare)
+    try {
+      const { getCloudflareContext } = await import('@opennextjs/cloudflare');
+      const { env } = getCloudflareContext();
+      if (env?.AI) {
+        console.log('Using Cloudflare AI binding...');
+        const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          max_tokens: 1024,
+          messages: body.messages,
+          temperature: 0.7,
+        });
 
-    // Priority 1: Cloudflare AI Binding
-    if (env?.AI) {
-      console.log('Using Cloudflare AI binding...');
-      const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-        max_tokens: 1024,
-        messages: body.messages,
-        temperature: 0.7,
-      });
-
-      return new Response(
-        JSON.stringify({
-          response: response.response || 'No response from AI',
-          success: true,
-        }),
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+        return new Response(
+          JSON.stringify({
+            response: response.response || 'No response from AI',
+            success: true,
+          }),
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    } catch {
+      // Not running on Cloudflare, fall through to REST API
     }
 
-    // Priority 2: Cloudflare AI via REST API (for local development without wrangler)
+    // Priority 2: Cloudflare AI via REST API (works on any platform)
     const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
     const apiToken = process.env.CLOUDFLARE_API_TOKEN;
 
