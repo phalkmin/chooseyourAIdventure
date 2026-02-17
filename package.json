@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
-		"build:worker": "opennextjs-cloudflare build && cp .open-next/worker.js .open-next/assets/_worker.js",
+		"build:worker": "opennextjs-cloudflare build && mkdir -p .open-next/assets/_worker.js && cp .open-next/worker.js .open-next/assets/_worker.js/index.js && cp -r .open-next/cloudflare .open-next/middleware .open-next/server-functions .open-next/.build .open-next/assets/_worker.js/",
 		"start": "next start",
 		"preview": "opennextjs-cloudflare preview",
 		"deploy": "opennextjs-cloudflare deploy"
