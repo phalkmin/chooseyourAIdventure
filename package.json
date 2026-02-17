@@ -4,12 +4,13 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
-		"build": "next build",
+		"build": "opennextjs-cloudflare build",
 		"start": "next start",
-		"pages:dev": "wrangler pages dev",
-		"pages:deploy": "npm run build && wrangler pages deploy"
+		"preview": "opennextjs-cloudflare preview",
+		"deploy": "opennextjs-cloudflare deploy"
 	},
 	"dependencies": {
+		"@types/react-dom": "^19.2.3",
 		"highlight.js": "^11.11.1",
 		"next": "^16.1.6",
 		"react": "^19.2.4",
