@@ -518,3 +518,203 @@ header .nav-brand p {
     z-index: -1;
     border-radius: 20px;
 }
+
+/* ============================================================
+   Game UI — AdventureChat
+   Themed via data-theme="dark" | data-theme="light" on .game-main
+   ============================================================ */
+
+.game-main {
+  padding: 100px 20px 20px;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  transition: background 0.3s ease;
+}
+
+.game-main[data-theme="dark"]  { background: #1a1a1a; }
+.game-main[data-theme="light"] { background: #212529; }
+
+/* Wrapper */
+.game-wrapper {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.game-main[data-theme="dark"]  .game-wrapper { background-color: #212529; color: #fff; border: 4px solid #fff; }
+.game-main[data-theme="light"] .game-wrapper { background-color: #fff;    color: #212529; border: 4px solid #000; }
+
+/* Scene viewport */
+.scene-viewport {
+  width: 100%;
+  height: 300px;
+  background-color: #000;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.game-main[data-theme="dark"]  .scene-viewport { border-bottom: 4px solid #fff; }
+.game-main[data-theme="light"] .scene-viewport { border-bottom: 4px solid #000; }
+
+.scene-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+/* Dialogue log */
+.dialogue-log {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-main[data-theme="dark"]  .dialogue-log { background-color: #2d2d2d; }
+.game-main[data-theme="light"] .dialogue-log { background-color: #f7f7f7; }
+
+/* Command center */
+.command-center {
+  padding: 20px;
+  flex-shrink: 0;
+  min-height: 150px;
+}
+
+.game-main[data-theme="dark"]  .command-center { background-color: #1a1a1a; border-top: 4px solid #fff; }
+.game-main[data-theme="light"] .command-center { background-color: #e7e7e7; border-top: 4px solid #000; }
+
+/* Messages */
+.message-row {
+  display: flex;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+.message-row.player { justify-content: flex-end; }
+
+.avatar-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 15px;
+  flex-shrink: 0;
+  width: 80px;
+}
+
+.avatar-img {
+  width: 64px;
+  height: 64px;
+  background-color: #fff;
+  image-rendering: pixelated;
+}
+
+.game-main[data-theme="dark"]  .avatar-img { border: 4px solid #fff; }
+.game-main[data-theme="light"] .avatar-img { border: 4px solid #000; }
+
+.avatar-name {
+  font-size: 8px;
+  margin-top: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.game-main[data-theme="dark"]  .avatar-name { color: #fff; }
+.game-main[data-theme="light"] .avatar-name { color: #212529; }
+
+/* NES balloon overrides */
+.game-wrapper .nes-balloon {
+  font-size: 10px !important;
+  max-width: 85%;
+  color: #212529 !important;
+  line-height: 1.6;
+}
+
+/* Narrative */
+.narrative-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 30px 0;
+}
+
+.narrative-balloon {
+  background-color: #fff !important;
+  border: 4px solid #000 !important;
+  padding: 15px !important;
+  text-align: center;
+  max-width: 90% !important;
+  font-style: italic;
+  color: #555 !important;
+}
+
+/* Controls */
+.controls-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+}
+
+/* Options */
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Input row */
+.input-row {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.input-row .nes-input { flex-grow: 1; }
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+}
+
+/* Utility classes for game UI */
+.choice-btn    { text-align: left; }
+.choices-label { font-size: 12px; margin-bottom: 10px; }
+.char-label    { font-size: 14px; margin-bottom: 10px; }
+.loading-text  { font-size: 10px; margin-bottom: 10px; }
+.loading-bar   { width: 80%; }
+
+/* Dark mode NES.css element overrides */
+.game-main[data-theme="dark"] .nes-input {
+  background-color: #212529 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.game-main[data-theme="dark"] .nes-select select {
+  background-color: #212529 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.game-main[data-theme="dark"] .nes-btn:not(.is-primary) {
+  background-color: #212529 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}

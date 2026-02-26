@@ -4,12 +4,14 @@ export const runtime = 'edge';
 
 interface ImageBody {
   prompt?: string;
+  seed?: number;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ImageBody;
     const prompt = body.prompt || 'A beautiful fantasy landscape';
+    const seed = body.seed || Math.floor(Math.random() * 1000000);
 
     // Priority 1: Cloudflare AI Binding (only works on Cloudflare)
     try {
@@ -24,6 +26,8 @@ export async function POST(req: NextRequest) {
             width: 512,
             height: 512,
             num_steps: 4,
+            // @ts-ignore - Some bindings might support seed or we can append it to prompt
+            seed: seed,
           }
         );
 
@@ -54,6 +58,7 @@ export async function POST(req: NextRequest) {
             width: 512,
             height: 512,
             num_steps: 4,
+            seed: seed,
           }),
         }
       );

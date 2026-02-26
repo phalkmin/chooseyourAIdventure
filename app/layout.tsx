@@ -2,8 +2,9 @@ import { Metadata } from 'next';
 import '../styles/globals.css';
 import '../styles/nes.css';
 import '../styles/fonts.css';
+import TransitionWrapper from '../components/TransitionWrapper';
 
-export const runtime = 'edge';
+//export const runtime = 'edge';
 
 export const metadata: Metadata = {
   title: 'Choose Your Own AIdventure - RPG Text Game',
@@ -34,7 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TransitionWrapper>{children}</TransitionWrapper>
+      </body>
     </html>
   );
 }
