@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import Header from './Header';
 import Typewriter from './Typewriter';
 import { ScenarioConfig } from '../lib/scenarios';
 import { useTheme } from '../lib/useTheme';
@@ -242,7 +241,6 @@ export default function AdventureChat({ scenario }: AdventureChatProps) {
 
   return (
     <>
-      <Header />
       <main id="nescss" className="game-main" data-theme={theme}>
         <audio ref={audioRef} src={scenario.audioTrack} loop />
 

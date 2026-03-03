@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import Header from '../components/Header';
 
 export default function HomePage() {
   return (
     <>
-      <Header />
       <main id="nescss">
         <div className="container">
           <section className="showcase">

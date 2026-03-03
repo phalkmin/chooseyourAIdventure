@@ -3,6 +3,7 @@ import '../styles/globals.css';
 import '../styles/nes.css';
 import '../styles/fonts.css';
 import TransitionWrapper from '../components/TransitionWrapper';
+import Header from '../components/Header';
 
 //export const runtime = 'edge';
 
@@ -36,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Header />
         <TransitionWrapper>{children}</TransitionWrapper>
       </body>
     </html>
