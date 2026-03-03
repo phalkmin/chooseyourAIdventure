@@ -13,6 +13,9 @@ export async function POST(req: NextRequest) {
     const prompt = body.prompt || 'A beautiful fantasy landscape';
     const seed = body.seed || Math.floor(Math.random() * 1000000);
 
+    // Negative prompt to steer away from diffuse/blurry/realistic looks
+    const negative_prompt = "photorealistic, blurry, soft, gradient, 3d render, digital painting, smooth, out of frame, watermark, signature";
+
     // Priority 1: Cloudflare AI Binding (only works on Cloudflare)
     try {
       const { getCloudflareContext } = await import('@opennextjs/cloudflare');
@@ -23,10 +26,10 @@ export async function POST(req: NextRequest) {
           '@cf/bytedance/stable-diffusion-xl-lightning',
           {
             prompt: prompt,
-            width: 512,
-            height: 512,
-            num_steps: 4,
-            // @ts-ignore - Some bindings might support seed or we can append it to prompt
+            negative_prompt: negative_prompt,
+            width: 1024,
+            height: 576, // 16:9 ratio
+            num_steps: 8, // Increased for better definition
             seed: seed,
           }
         );
@@ -55,9 +58,10 @@ export async function POST(req: NextRequest) {
           },
           body: JSON.stringify({
             prompt: prompt,
-            width: 512,
-            height: 512,
-            num_steps: 4,
+            negative_prompt: negative_prompt,
+            width: 1024,
+            height: 576,
+            num_steps: 8,
             seed: seed,
           }),
         }

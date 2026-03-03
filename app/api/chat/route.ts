@@ -30,9 +30,29 @@ export async function POST(req: NextRequest) {
       const { env } = getCloudflareContext();
       if (env?.AI) {
         console.log('Using Cloudflare AI binding...');
+        
+        // Count user messages to determine story progress
+        const userMessageCount = body.messages.filter(m => m.role === 'user').length;
+        let pacingInstruction = "";
+        
+        if (userMessageCount >= 10) {
+          pacingInstruction = "FINAL TURN: The story must end NOW. Resolve the objective based on the player's past successes or failures. The player either achieves total victory or a definitive, dramatic death. Do not provide new choices.";
+        } else if (userMessageCount >= 8) {
+          pacingInstruction = "CLIMAX: High Stakes. One of the three choices must be a 'Lethal Trap' that leads to an immediate Game Over (death or total failure). The player must use logic or story knowledge to avoid it.";
+        } else if (userMessageCount >= 4) {
+          pacingInstruction = "MID-GAME: Introduce 'Hidden Traps'. One of the three choices should seem viable but lead to a major complication (imprisonment, loss of a key item, or a near-death encounter) if selected. The trap must be logically consistent (e.g., you cannot punch an armored orc without consequence).";
+        } else {
+          pacingInstruction = "BEGINNING: Set the scene and establish the first conflict. Keep choices relatively safe but engaging.";
+        }
+
+        const messagesWithPacing = [
+          ...body.messages,
+          { role: 'system', content: `[PACING DIRECTIVE: Turn ${userMessageCount}/10. ${pacingInstruction}]` }
+        ];
+
         const response = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
           max_tokens: 1024,
-          messages: body.messages,
+          messages: messagesWithPacing,
           temperature: 0.7,
         });
 
@@ -54,6 +74,27 @@ export async function POST(req: NextRequest) {
 
     if (accountId && apiToken) {
       console.log('Using Cloudflare AI via REST API...');
+
+      // PACING LOGIC: Count user messages to determine story progress
+      const userMessageCount = body.messages.filter(m => m.role === 'user').length;
+      let pacingInstruction = "";
+
+      if (userMessageCount >= 10) {
+        pacingInstruction = "FINAL TURN: The story must end NOW. Resolve the objective based on the player's past successes or failures. The player either achieves total victory or a definitive, dramatic death. Do not provide new choices.";
+      } else if (userMessageCount >= 8) {
+        pacingInstruction = "CLIMAX: High Stakes. One of the three choices must be a 'Lethal Trap' that leads to an immediate Game Over (death or total failure). The player must use logic or story knowledge to avoid it.";
+      } else if (userMessageCount >= 4) {
+        pacingInstruction = "MID-GAME: Introduce 'Hidden Traps'. One of the three choices should seem viable but lead to a major complication (imprisonment, loss of a key item, or a near-death encounter) if selected. The trap must be logically consistent (e.g., you cannot punch an armored orc without consequence).";
+      } else {
+        pacingInstruction = "BEGINNING: Set the scene and establish the first conflict. Keep choices relatively safe but engaging.";
+      }
+
+      // Inject the pacing instruction as a hidden system message at the end
+      const messagesWithPacing = [
+        ...body.messages,
+        { role: 'system', content: `[PACING DIRECTIVE: Turn ${userMessageCount}/10. ${pacingInstruction}]` }
+      ];
+
       const response = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/meta/llama-3.1-8b-instruct`,
         {
@@ -63,7 +104,7 @@ export async function POST(req: NextRequest) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            messages: body.messages,
+            messages: messagesWithPacing,
             max_tokens: 1024,
           }),
         }

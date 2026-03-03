@@ -43,6 +43,7 @@ export default function AdventureChat({ scenario }: AdventureChatProps) {
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isMusicExplicitlyPaused, setIsMusicExplicitlyPaused] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [feedbackClass, setFeedbackClass] = useState<string>('');
 
   useEffect(() => {
     setIsMounted(true);
@@ -119,7 +120,55 @@ export default function AdventureChat({ scenario }: AdventureChatProps) {
       let npcName = '';
       let portraitUrl = '';
 
-      const npcMatch = botMessage.match(/NPC:\s*([^:\n]+)/i);
+      // Trigger action feedback based on keywords
+      const lowerMsg = botMessage.toLowerCase();
+      if (
+        lowerMsg.includes('damage') ||
+        lowerMsg.includes('hurt') ||
+        lowerMsg.includes('hit') ||
+        lowerMsg.includes('attack') ||
+        lowerMsg.includes('wound') ||
+        lowerMsg.includes('struck') ||
+        lowerMsg.includes('pain')
+      ) {
+        setFeedbackClass('screen-shake flash-red');
+        setTimeout(() => setFeedbackClass(''), 1000);
+      } else if (
+        lowerMsg.includes('gold') ||
+        lowerMsg.includes('loot') ||
+        lowerMsg.includes('treasure') ||
+        lowerMsg.includes('coin') ||
+        lowerMsg.includes('found') ||
+        lowerMsg.includes('gain') ||
+        lowerMsg.includes('reward')
+      ) {
+        setFeedbackClass('flash-gold');
+        setTimeout(() => setFeedbackClass(''), 1000);
+      }
+
+      // 1. Parallel Start: Scene Image Generation (Pre-fetching)
+      const cleanPrompt = botMessage
+        .replace(/NPC:\s*[^\n]+/gi, '')
+        .replace(/NARRATIVE:\s*/gi, '')
+        .split(/Choices:/i)[0]
+        .trim();
+
+      const sceneImagePromise = fetch('/api/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `${scenario.imagePromptPrefix}${cleanPrompt.substring(0, 300)}`,
+          seed: sessionSeed,
+        }),
+      }).then(async res => {
+        if (res.ok) {
+          const blob = await res.blob();
+          updateSceneImageUrl(URL.createObjectURL(blob));
+        }
+      }).catch(err => console.error('Scene image error:', err));
+
+      // 2. NPC Portrait Logic
+      const npcMatch = botMessage.match(/NPC:\s*([^\n.:]+)/i);
       if (npcMatch) {
         npcName = npcMatch[1].trim();
         if (npcPortraits[npcName]) {
@@ -158,24 +207,8 @@ export default function AdventureChat({ scenario }: AdventureChatProps) {
         { id: nextMsgId(), role: 'assistant', content: botMessage, npcName, portraitUrl },
       ]);
 
-      if (botMessage) {
-        try {
-          const imageResponse = await fetch('/api/image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              prompt: `${scenario.imagePromptPrefix}${botMessage.substring(0, 200)}`,
-              seed: sessionSeed,
-            }),
-          });
-          if (imageResponse.ok) {
-            const blob = await imageResponse.blob();
-            updateSceneImageUrl(URL.createObjectURL(blob));
-          }
-        } catch (imageError) {
-          console.error('Image generation error:', imageError);
-        }
-      }
+      // Wait for scene image if needed (though it's parallel now)
+      await sceneImagePromise;
     } catch (error) {
       console.error('Error:', error);
       setMessages(prev => [
@@ -213,7 +246,7 @@ export default function AdventureChat({ scenario }: AdventureChatProps) {
       <main id="nescss" className="game-main" data-theme={theme}>
         <audio ref={audioRef} src={scenario.audioTrack} loop />
 
-        <div className="game-wrapper">
+        <div className={`game-wrapper ${feedbackClass}`}>
           <div className="controls-container">
             <button className="nes-btn is-small" onClick={toggleTheme}>
               {theme === 'dark' ? '☀️' : '🌙'}
@@ -238,7 +271,12 @@ export default function AdventureChat({ scenario }: AdventureChatProps) {
               if (message.role === 'system') return null;
 
               const isNarrative = message.role === 'assistant' && !message.portraitUrl;
-              const cleanContent = message.content.split('Choices:')[0];
+              // Clean the content of ALL structure tags for the UI
+              const cleanContent = message.content
+                .replace(/NPC:\s*[^\n]+\n?/i, '')
+                .replace(/NARRATIVE:\s*/gi, '')
+                .split('Choices:')[0]
+                .trim();
               const isLastMessage = index === messages.length - 1;
 
               if (isNarrative) {

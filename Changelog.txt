@@ -1,0 +1,34 @@
+CHANGELOG - 2026-03-02
+
+SESSION SUMMARY:
+Implemented multiple UX and technical enhancements as outlined in IMPROVEMENTS.md, focusing on retro aesthetics, feedback, and performance.
+
+CORE CHANGES:
+
+1. Pixel Transitions:
+   - Updated TransitionWrapper.tsx to use a "shutter" clip-path animation.
+   - Replaced standard fade/scale with a retro-style opening/closing effect.
+
+2. Action Feedback:
+   - Added 'shake', 'flash-red', and 'flash-gold' animations to globals.css.
+   - Implemented keyword detection in AdventureChat.tsx (damage, hit, gold, treasure, etc.).
+   - Visual feedback (screen shake/flashes) now triggers dynamically based on AI narration.
+
+3. Image Pre-fetching:
+   - Optimized sendMessage flow in AdventureChat.tsx.
+   - Scene image generation now starts in parallel with NPC portrait generation.
+   - Significantly reduces the wait time for the main scene image.
+
+4. Mobile UX:
+   - Adjusted game-wrapper height using dynamic viewport units (100dvh).
+   - Optimized scene-viewport height for smaller screens.
+   - Enhanced touch-friendly styling for choice buttons and chat balloons.
+   - Fixed layout constraints to ensure a better "fixed-viewport" feel on mobile browsers.
+
+5. Documentation:
+   - Updated IMPROVEMENTS.md to reflect completed features.
+   - Created this Changelog.txt.
+
+VERIFICATION:
+- Build successful (npm run build).
+- Manual code review of component logic and CSS overrides.

@@ -10,10 +10,11 @@ export default function TransitionWrapper({ children }: { children: React.ReactN
     <AnimatePresence mode="wait">
       <motion.div
         key={pathname}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 1.05 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        initial={{ clipPath: 'inset(0 50% 0 50%)', opacity: 0 }}
+        animate={{ clipPath: 'inset(0 0% 0 0%)', opacity: 1 }}
+        exit={{ clipPath: 'inset(0 50% 0 50%)', opacity: 0 }}
+        transition={{ duration: 0.4, ease: [0.45, 0, 0.55, 1] }}
+        style={{ width: '100%', height: '100%' }}
       >
         {children}
       </motion.div>
