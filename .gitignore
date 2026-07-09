@@ -1,6 +1,6 @@
 # Logs
 npm-cache-local
-
+.claude
 logs
 _.log
 npm-debug.log_
